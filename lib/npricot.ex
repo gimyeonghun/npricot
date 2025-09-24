@@ -1,15 +1,21 @@
 defmodule Npricot do
   @external_resource "README.md"
   @moduledoc "README.md"
+              |> File.read!()
 
   @doc false
-  def extract(path) do
+  def extract(_module, opts) do
+    from = Keyword.fetch!(opts, :from)
+    as = Keyword.fetch!(opts, :as)
+    paths = from |> Path.wildcard()
+    builder = Npricot.Model
+    
     entries =
       paths
       |> Task.async_stream(
         fn path ->
-          parsed_contents = parse_contents!(oath, File.read!(path), parser)
-          build_entry(builder, converter, path, parsed_contents, opts)
+          parsed_contents = parse_contents!(path, File.read!(path))
+          build_entry(builder, path, parsed_contents, opts)
         end,
         timeout: :infinity
       )
@@ -18,67 +24,65 @@ defmodule Npricot do
         _ -> []
       end)
       
-      Module.put_attribute(module, as, entries)
-      {from, paths} 
+      # Module.put_attribute(module, as, entries)
+      
   end
   
-  defp build_entry(builder, converter, path, {_attrs, _body} = parsed_contents. opts) do
-    build_entry(builder, converter, path, [parsed_contents], opts)
+  defp build_entry(builder, path, {_attrs, _body} = parsed_contents, opts) do
+    build_entry(builder, path, [parsed_contents], opts)
   end
   
-  defp build_entry(builder, converter, path, parsed_contents. opts) when is_list(parsed_contents) do
+  defp build_entry(builder, path, parsed_contents, opts)
+       when is_list(parsed_contents) do
     Enum.map(parsed_contents, fn {attrs, body} ->
-      body =
-        if converter do
-          converter.convert(path, body, attrs, opts)
-        else
-          extname = path |> Path.extname() |> String.downcase()
-          convert_body(path, extname, body, opts)
-        end
-        
+      extname = path |> Path.extname() |> String.downcase()
+      body = convert_body(path, extname, body, opts)
       builder.build(path, attrs, body)
     end)
   end
   
-  defp parsed_contents!(path, contents, nil) do
+  defp parse_contents!(path, contents) do
     case parse_contents(path, contents) do
       {:ok, attrs, body} ->
         {attrs, body}
-      
+    
       {:error, message} ->
         raise """
         #{message}
-        
-        Each entry must have a map with attributes
+    
+        Each entry must have a map with attributes, followed by --- and a body. For example:
+    
+            %{
+              title: "Hello World"
+            }
+            ---
+            Hello world!
+    
         """
-        
-      end
     end
-    
-    defp parsed_contents!(path, contents, parser) do
-      parser.parse(path, contents)
+  end
+  
+  defp parse_contents(path, contents) do
+    case :binary.split(contents, ["\n---\n", "\r\n---\r\n"]) do
+      [body] -> 
+        {:ok, %{}, body}
+      [code, body] ->
+        case Code.eval_string(code, []) do
+          {%{} = attrs, _} ->
+            {:ok, attrs, body}
+            
+          {other, _} ->
+            {:error,
+              "expected attributes for #{inspect(path)} to return a map; got #{inspect(other)}"}
+        end
     end
-    
-    defp parsed_contents(path, contents) do
-      case :binary.split(contents, ["\n---\n", "\r\n---\r\n"]) do
-        [_] ->
-          {:error, "could not find separator --- in #{inspect(path)}"}
-        
-        [code, body] ->
-          case Code.eval_string(code, []) do
-            {%{} = attrs, _} ->
-              {:ok, attrs, body}
-            {other, _} ->
-              {:error,
-                "expected attributes for #{inspect(path)} to return a mpa, got: #{inspect(other)}"}
-          end
-      end
-    end
-    
-    defp convert_body(path, extname, body, opts) when extname in [".md", ".markdown"] do
-    end
-    
-    defp convert_body(_path, _extname, body, _opts) do
-      body
-    end
+  end
+  
+  defp convert_body(_path, extname, body, _opts) when extname in [".md", ".markdown"] do
+    MDEx.to_html!(body)
+  end
+  
+  defp convert_body(_path, _extname, body, _opts) do
+    body
+  end
 end
