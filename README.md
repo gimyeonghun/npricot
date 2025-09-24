@@ -1,5 +1,7 @@
 # Npricot
 
+<!-- MDOC !-->
+
 A Zettelkasten companion. Write your Markdown files in any text editor, while Npricot will provide the visual flair and additional interactivity. 
 
 The Npricot architecture is based off Dr. Drang's posts on a "No-Server Personal Wiki". As this is an Elixir project, it extensively uses `Mix.Task`.
