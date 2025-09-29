@@ -18,6 +18,7 @@ defmodule NpricotWeb.Router do
     pipe_through :browser
 
     live "/", TableLive.Index, :index
+    live "/directory", FileSystemLive.Index
   end
 
   # Other scopes may use custom stacks.

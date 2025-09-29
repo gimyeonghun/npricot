@@ -59,7 +59,7 @@ config :npricot, NpricotWeb.Endpoint,
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/npricot_web_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
+      ~r"lib/npricot_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
     ]
   ]
 

@@ -31,15 +31,15 @@ defmodule Npricot.FileSystem do
   """
   def list(path \\ nil, recursive \\ false) do
     dir = if path do
-      default_path()
-    else
       path
+    else
+      default_path()
     end
     
     case File.ls(dir) do
       {:ok, files} ->
         paths = Enum.map(files, fn name ->
-          path = Path.join(path, name)
+          path = Path.join(dir, name)
           if File.dir?(path), do: path <> "/", else: path
         end)
         
@@ -57,7 +57,7 @@ defmodule Npricot.FileSystem do
             end
         end)
       {:error, error} ->
-        IO.puts("Expected a path, got #{inspect(error)}")
+        {:error, error}
     end
   end
   
