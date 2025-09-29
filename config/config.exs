@@ -9,7 +9,8 @@ import Config
 
 config :npricot,
   ecto_repos: [Npricot.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+  watched_file_path: System.get_env("WATCHED_FILE_PATH", "/Volumes/Macintosh HD/Users/kim/Repositories/Developing/npricot/sample_repo/202401151030.md")
 
 # Configures the endpoint
 config :npricot, NpricotWeb.Endpoint,
