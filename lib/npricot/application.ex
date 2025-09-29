@@ -8,14 +8,12 @@ defmodule Npricot.Application do
   @impl true
   def start(_type, _args) do
     
-    file_path = Application.get_env(:npricot, :watched_file_path, "/Volumes/Macintosh HD/Users/kim/Repositories/Developing/npricot/sample_repo/202401151030.md")
-    
     children = [
       NpricotWeb.Telemetry,
       Npricot.Repo,
       {DNSCluster, query: Application.get_env(:npricot, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Npricot.PubSub},
-      {Npricot.FileSystem.Watcher, file_path},
+      Npricot.FileSystem.Watcher,
       # Start a worker by calling: Npricot.Worker.start_link(arg)
       # {Npricot.Worker, arg},
       # Start to serve requests, typically the last entry

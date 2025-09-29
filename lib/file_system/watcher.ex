@@ -2,14 +2,16 @@ defmodule Npricot.FileSystem.Watcher do
   use GenServer
   require Logger
   
+  alias Npricot.FileSystem
+  
   @file_check_interval 1000
   
   defstruct [:file_path, :last_modified, :content, :subscribers]  
   @impl true
-  def init(file_path) do
-    unless File.exists?(file_path) do
-      File.write!(file_path, "")
-    end
+  def init(_arg) do
+    filename = "202401151030.md"
+    
+    file_path = Path.join(FileSystem.Utils.default_dir(), filename)
     
     state = %__MODULE__{
       file_path: file_path,
@@ -98,9 +100,8 @@ defmodule Npricot.FileSystem.Watcher do
     {:noreply, %{state | subscribers: new_subscribers}}
   end
   
-  @impl true
-  def start_link(file_path) do
-    GenServer.start_link(__MODULE__, file_path, name: __MODULE__)
+  def start_link(arg) do
+    GenServer.start_link(__MODULE__, arg, name: __MODULE__)
   end
   
   def get_content do
