@@ -20,6 +20,7 @@ defmodule NpricotWeb.Router do
     live "/", TableLive.Index, :index
     live "/directory", FileSystemLive.Index
     live "/file-editor", FileEditorLive, :index
+    live "/inbox", FileSystemLive.Inbox
   end
 
   # Other scopes may use custom stacks.

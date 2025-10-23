@@ -3,14 +3,14 @@ defmodule Npricot do
   @moduledoc "README.md"
               |> File.read!()
               
-  def call() do
-    with true <- File.dir?(directory),
-         {:ok, files} <- list_files(directory) do
-      Enum.reduce(files, 0, fn file, size -> size + calculate_file_size(file) end)
-      |> Kernel.div(length(files))
-      |> IO.puts()
-    end
-  end
+  # def call() do
+  #   with true <- File.dir?(directory),
+  #        {:ok, files} <- list_files(directory) do
+  #     Enum.reduce(files, 0, fn file, size -> size + calculate_file_size(file) end)
+  #     |> Kernel.div(length(files))
+  #     |> IO.puts()
+  #   end
+  # end
 
   @doc false
   def extract(_module, opts) do
